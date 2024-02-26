@@ -1,4 +1,4 @@
-package uz.ipotekabank.natsexample;
+package uz.ipotekabank.natsexample.component;
 
 import io.nats.client.Connection;
 
