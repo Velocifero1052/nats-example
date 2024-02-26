@@ -7,14 +7,17 @@ import io.nats.client.Dispatcher;
 import io.nats.client.Message;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
+import uz.ipotekabank.natsexample.dto.ExampleNatsResponseDto;
 import uz.ipotekabank.natsexample.service.NatsService;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static uz.ipotekabank.natsexample.cosnt.NatsTopics.FIRST_TOPIC;
+import static uz.ipotekabank.natsexample.cosnt.NatsTopics.METHOD_TOPIC;
 import static uz.ipotekabank.natsexample.cosnt.NatsTopics.SYNC_TOPIC;
 
 @Service
@@ -57,6 +60,16 @@ public class NatsServiceImplementation implements NatsService {
     }
 
     @Override
+    public ExampleNatsResponseDto publicMessageToMethodTopic(String message) throws ExecutionException, InterruptedException {
+        var map = new HashMap<String, String>();
+        map.put("message", message);
+        var s = natsConnection.request(METHOD_TOPIC, gson.toJson(map).getBytes())
+                .thenApply(Message::getData)
+                .thenApply(String::new);
+        return gson.fromJson(s.get(), ExampleNatsResponseDto.class);
+    }
+
+    @Override
     public void firstTopicListener(Message message) {
         var map = gson.fromJson(new String(message.getData(), StandardCharsets.UTF_8), Map.class);
         System.out.println("Topic listener: #######################");
@@ -73,6 +86,15 @@ public class NatsServiceImplementation implements NatsService {
     @Override
     public void publishMessage(String topicName, Object object) {
         natsConnection.publish(topicName, gson.toJson(object).getBytes());
+    }
+
+    @Override
+    public <T> T makeRequest(String topic, String jsonString) throws ExecutionException, InterruptedException {
+        var s = this.natsConnection.request(topic, gson.toJson(jsonString).getBytes())
+                .thenApply(Message::getData)
+                .thenApply(String::new);
+        Type type = new TypeToken<T>() {}.getType();
+        return gson.fromJson(s.get(), type);
     }
 
 }

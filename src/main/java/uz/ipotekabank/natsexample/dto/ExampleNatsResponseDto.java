@@ -6,5 +6,5 @@ import lombok.Data;
 public class ExampleNatsResponseDto {
     String errorMsg;
     String topicName;
-    Object payload;
+    String payload;
 }

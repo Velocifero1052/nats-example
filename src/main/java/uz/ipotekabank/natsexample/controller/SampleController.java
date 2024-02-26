@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uz.ipotekabank.natsexample.service.NatsService;
-import uz.ipotekabank.natsexample.service.SampleService;
+import uz.ipotekabank.natsexample.service.SampleServiceTwo;
 
 import java.util.concurrent.ExecutionException;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 public class SampleController {
 
     private final NatsService natsService;
-    private final SampleService sampleService;
+    private final SampleServiceTwo sampleServiceTwo;
 
     @GetMapping("/first_topic")
     ResponseEntity<?> postSomeMessage(@RequestParam("message")String message) {
@@ -26,16 +26,13 @@ public class SampleController {
     @GetMapping("/sync_topic")
     ResponseEntity<?> postMessageWithInstantResponse(@RequestParam("message")String message) throws ExecutionException, InterruptedException {
         var resp = natsService.publishMessageToSyncTopic(message);
-        System.out.println("##########################");
-        System.out.println(resp);
-        System.out.println("##########################");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(resp);
     }
 
     @GetMapping("/sample_service_method")
-    ResponseEntity<?> postMessageToServiceMethod(@RequestParam("message")String message) {
-        //var resp = sampleService.sampleListenerMethod(message);
-        return ResponseEntity.ok().build();
+    ResponseEntity<?> postMessageToServiceMethod(@RequestParam("message")String message) throws ExecutionException, InterruptedException {
+        var res = sampleServiceTwo.exchangeAndGetResultParam(message);
+        return ResponseEntity.ok().body(res);
     }
 
 }
