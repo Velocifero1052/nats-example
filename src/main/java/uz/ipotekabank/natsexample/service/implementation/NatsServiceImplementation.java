@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Message;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uz.ipotekabank.natsexample.service.NatsService;
 
@@ -19,13 +20,16 @@ import static uz.ipotekabank.natsexample.cosnt.NatsTopics.SYNC_TOPIC;
 @Service
 public class NatsServiceImplementation implements NatsService {
     private final Gson gson;
+    @Getter
     private final Connection natsConnection;
+    @Getter
+    private final Dispatcher dispatcher;
 
     public NatsServiceImplementation(Connection natsConnection) {
         gson = new Gson();
         this.natsConnection = natsConnection;
         //creating and initializing dispatcher with subscriptions
-        Dispatcher dispatcher = natsConnection.createDispatcher();
+        dispatcher = natsConnection.createDispatcher();
         dispatcher.subscribe(FIRST_TOPIC, this::firstTopicListener);
         dispatcher.subscribe(SYNC_TOPIC, msg -> {
             var res = syncTopicListener(msg);
@@ -64,6 +68,11 @@ public class NatsServiceImplementation implements NatsService {
     public Map<String, String> syncTopicListener(Message message) {
         return Map.of("topic_name", SYNC_TOPIC,
                 "received_value", new String(message.getData(), StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public void publishMessage(String topicName, Object object) {
+        natsConnection.publish(topicName, gson.toJson(object).getBytes());
     }
 
 }
