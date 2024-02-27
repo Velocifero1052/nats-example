@@ -24,5 +24,5 @@ public interface NatsService {
 
     void publishMessage(String topicName, Object jsonString);
 
-    <T> T makeRequest(String topic, String jsonString) throws ExecutionException, InterruptedException;
+    <T> T makeRequest(String topic, String jsonString, Class<T> classOfT) throws ExecutionException, InterruptedException;
 }

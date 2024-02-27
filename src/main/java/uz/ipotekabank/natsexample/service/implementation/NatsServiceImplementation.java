@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import uz.ipotekabank.natsexample.dto.ExampleNatsResponseDto;
 import uz.ipotekabank.natsexample.service.NatsService;
 
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,12 +88,11 @@ public class NatsServiceImplementation implements NatsService {
     }
 
     @Override
-    public <T> T makeRequest(String topic, String jsonString) throws ExecutionException, InterruptedException {
+    public <T> T makeRequest(String topic, String jsonString, Class<T> classOfT) throws ExecutionException, InterruptedException {
         var s = this.natsConnection.request(topic, gson.toJson(jsonString).getBytes())
                 .thenApply(Message::getData)
                 .thenApply(String::new);
-        Type type = new TypeToken<T>() {}.getType();
-        return gson.fromJson(s.get(), type);
+        return gson.fromJson(s.get(), classOfT);
     }
 
 }

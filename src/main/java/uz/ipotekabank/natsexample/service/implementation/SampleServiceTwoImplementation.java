@@ -31,7 +31,10 @@ public class SampleServiceTwoImplementation implements SampleServiceTwo {
 
     @Override
     public ExampleNatsResponseDto exchangeAndGetResultParam(String message) throws ExecutionException, InterruptedException {
-        var res = natsService.<ExampleNatsResponseDto>makeRequest(METHOD_TOPIC, message);
+        var res = natsService.makeRequest(METHOD_TOPIC, message, ExampleNatsResponseDto.class);
+        System.out.println("--------------------------");
+        System.out.println(res);
+        System.out.println("--------------------------");
         return res;
     }
 
