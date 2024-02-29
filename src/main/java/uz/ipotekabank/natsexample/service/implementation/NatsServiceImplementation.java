@@ -95,4 +95,11 @@ public class NatsServiceImplementation implements NatsService {
         return gson.fromJson(s.get(), classOfT);
     }
 
+    @Override
+    public <T, U> T makeRequest(String topic, U u, Class<T> classOfT) throws ExecutionException, InterruptedException {
+        var s = this.natsConnection.request(topic, gson.toJson(u).getBytes())
+                .thenApply(Message::getData)
+                .thenApply(String::new);
+        return gson.fromJson(s.get(), classOfT);
+    }
 }
