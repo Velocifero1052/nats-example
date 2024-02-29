@@ -5,6 +5,7 @@ import io.nats.client.Connection;
 import io.nats.client.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.ipotekabank.natsexample.dto.ExampleNatsRequestDto;
 import uz.ipotekabank.natsexample.dto.ExampleNatsResponseDto;
 import uz.ipotekabank.natsexample.service.NatsService;
 import uz.ipotekabank.natsexample.service.SampleServiceTwo;
@@ -32,9 +33,18 @@ public class SampleServiceTwoImplementation implements SampleServiceTwo {
     @Override
     public ExampleNatsResponseDto exchangeAndGetResultParam(String message) throws ExecutionException, InterruptedException {
         var res = natsService.makeRequest(METHOD_TOPIC, message, ExampleNatsResponseDto.class);
-        System.out.println("--------------------------");
+        System.out.println("-------------------------");
         System.out.println(res);
-        System.out.println("--------------------------");
+        System.out.println("------------------------");
+        return res;
+    }
+
+    @Override
+    public ExampleNatsResponseDto exchangeTypedMessage(ExampleNatsRequestDto dto) throws ExecutionException, InterruptedException {
+        var res = natsService.makeRequest(METHOD_TOPIC, dto, ExampleNatsResponseDto.class);
+        System.out.println("---------------------------");
+        System.out.println(res);
+        System.out.println("---------------------------");
         return res;
     }
 
